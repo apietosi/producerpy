@@ -24,9 +24,17 @@ parser.add_argument(
     type=float
 )
 
+parser.add_argument(
+    '--ext',
+    help='File format, mp4 or gif',
+    type=str,
+    default='mp4'
+)
+
 args = parser.parse_args()
 image = args.images
 fps = args.fps
+ext = args.ext
 
 # global directory and export name
 if os.path.isdir(image):
@@ -35,7 +43,7 @@ if os.path.isdir(image):
 
 video_name = image.split('/')[-2] + '_gif'
 export_loc = '/'.join(image.split('/')[:-2]) + '/'
-video_gif = os.path.join(export_loc, (video_name + '.mp4'))                                                                            
+video_mp4 = os.path.join(export_loc, (video_name + '.mp4'))                                                                            
 
 files = []
 if os.path.isdir(image):
@@ -58,7 +66,18 @@ for i in range(len(files)):
     frame_array.append(img)
 
 # write audio-less video
-out = cv2.VideoWriter(video_gif, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+out = cv2.VideoWriter(video_mp4, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
 for i in range(len(frame_array)):
     out.write(frame_array[i])
 out.release()
+
+# if gif, convert mp4 to gif, delete mp4
+if ext == 'gif':
+    video_gif = os.path.join(export_loc, (video_name + '.gif'))
+    cmd = 'ffmpeg -i ' + video_mp4 + ' ' + video_gif
+    subprocess.call(cmd, shell=True)
+
+    while not os.path.exists(video_gif):
+        x = 1 #hold
+
+    os.remove(video_mp4)
