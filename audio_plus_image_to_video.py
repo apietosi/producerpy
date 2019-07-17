@@ -45,11 +45,24 @@ export_loc = '/'.join(audio.split('/')[:-1]) + '/'
 temp_folder = os.path.join(export_loc, 'temp_vid_maker' + get_date_time_str() + '/')
 make_dir(temp_folder)
 
+# make temporary filepaths
 audio_temp = os.path.join(temp_folder, audio.split('/')
-                          [-1].split('.')[0] + '.m4a')
+                        [-1].split('.')[0] + '.mp4')
 video_temp = os.path.join(temp_folder, 'vid_no_audio.mp4')
 video_file = os.path.join(export_loc, audio.split('/')
-                          [-1].split('.')[0] + '.mp4')
+                        [-1].split('.')[0] + '.mp4')
+video_file_mov = os.path.join(export_loc, audio.split('/')
+                        [-1].split('.')[0] + '.mov')
+
+# ffmpeg won't overwrite video
+if os.path.exists(video_file):
+    os.remove(video_file)
+
+# convert audio to m4a format for video merge
+cmd = 'ffmpeg -i ' + audio + ' ' + audio_temp
+p = subprocess.Popen(cmd, shell=True)
+if p.wait() != 0:
+        print("There was an error with the audio file conversion")
 
 files = []
 if os.path.isdir(image):
@@ -59,7 +72,7 @@ if os.path.isdir(image):
             files.append(os.path.join(image,f))
 
 else:
-    files = [image]
+    files = [image]*100
 
 
 # specify frames per second using duration of audio file
@@ -75,30 +88,40 @@ for i in range(len(files)):
     size = (width, height)
     frame_array.append(img)
 
-# write audio-less video
-out = cv2.VideoWriter(video_temp, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
+# write audio-less video #'H264'
+out = cv2.VideoWriter(video_temp, cv2.VideoWriter_fourcc(*'MP4V'), fps, size)
 for i in range(len(frame_array)):
     out.write(frame_array[i])
 out.release()
 
-# convert audio to m4a format for video merge
-cmd = 'avconv -i ' + audio + ' ' + audio_temp
-subprocess.call(cmd, shell=True)
-
-# ffmpeg won't overwrite video
-if os.path.exists(video_file):
-    os.remove(video_file)
 
 while (os.path.exists(audio_temp) == False) & (os.path.exists(video_temp) == False):
     x = 3  # hold off on writing video until both files are ready
 
+# -c:v h264
+# https://pypi.org/project/ffmpy/0.0.4/
+
 cmd = 'ffmpeg -i ' + video_temp + ' -i ' + audio_temp + \
     ' -map 0:v -map 1:a -c copy ' + video_file
-subprocess.call(cmd, shell=True)
+p = subprocess.Popen(cmd, shell=True)
+if p.wait() != 0:
+        print("There was an error with the audio + (silent) video = video conversion")
+
 
 while (os.path.exists(video_file) == False):
     x = 4  # hold again
 
+
+cmd = 'ffmpeg -i ' + video_file + ' -vcodec h264 -acodec mp2 -max_muxing_queue_size 1024 ' + video_file_mov
+p = subprocess.Popen(cmd, shell=True)
+if p.wait() != 0:
+        print("There was an error with the mp4->mov conversation")
+
+
+while (os.path.exists(video_file_mov) == False):
+    x = 4  # hold again
+
 os.remove(audio_temp)
 os.remove(video_temp)
+os.remove(video_file)
 os.rmdir(temp_folder)
