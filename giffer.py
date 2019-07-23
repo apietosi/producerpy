@@ -7,8 +7,6 @@ import moviepy.editor as mp
 import datetime
 
 from argparse import ArgumentParser
-import os
-import datetime
 
 parser = ArgumentParser()
 

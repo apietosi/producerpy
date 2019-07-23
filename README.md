@@ -24,6 +24,12 @@ Nothing new here, just a script to generate audio-less gif's given the top folde
 python giffer.py <image_dir> <fps>
 ```
 
+## Plug-in Rotary Knob Asset Generator
+Convert an image of a rotary knob to a asset strip of the knob at every angle.  The input image should be at the knob's lowest position, 0, -1, whatever.  Prior to rotating, all white pixels are made transparent, and the image is converted to square.  If your knob is not symmetrical, I suggest you add a border so the image is not cropped at certain angles.
+```
+python plugin_rotary_knob_strip_asset.py <image.png> <export_width>
+```
+
 
 ## To run:
 Install Python via anaconda using the instructions [here](https://www.anaconda.com/distribution/).
@@ -33,5 +39,5 @@ You will also need a few open source CLI tools:
 brew install ffmpeg libav
 ```
 ```
-pip install ffmpeg opencv-python moviepy librosa soundfile
+pip install ffmpeg opencv-python moviepy librosa soundfile Pillow
 ```
