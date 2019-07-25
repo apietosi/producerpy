@@ -2,14 +2,21 @@
 A hodgepodge of Python scripts for automating tedious music production and programming-related tasks.
 
 ## Stem Killer (delete silent files)
-Deletes any audio files that are completely silent.  Often times when you export your tracks to stems to:
+Deletes any audio files that are completely silent.  You might export your tracks to stems to:
 - mix in a different DAW
 - share with a friend your project will contain stems
 ```
 python delete_silent_files.py <top_dir_of_stems>
 ```
+Often, you will find stems that contain no audio content.  These take up significant diskspace, and clutter your work environment/DAW.  This script only deletes files that are truly silent, files with very quiet sounds (reverb, noise, etc) will not be deleted.
 
-you will find stems that contain no audio content.  These take up significant diskspace, and clutter your work environment/DAW.  This script only deletes files that are truly silent, files with very quiet sounds (reverb, noise, etc) will not be deleted.
+
+## Organize your drum samples
+Copies drum files into a directory organized by drum type.  Specify a directory to search, and an export location to copy the files to.  If searching multiples directories, simply leave the same export location to keep everything together.  Will likely not copy files if they are being read from an external harddrive.  On that note, DO NOT SPECIFY your EXPORT LOCATION as a directory within an external harddrive.
+```
+python organize_drums.py <top_dir_of_drums> <export_location>
+```
+
 
 
 ## Plug-in Rotary Knob Asset Generator
